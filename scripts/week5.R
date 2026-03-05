@@ -1,84 +1,86 @@
-# ==========================================
-# PART 1: Iris Dataset (Box Plots)
-# ==========================================
-
-# 1. Load and Inspect
+# Load & Understand the iris Dataset
 data(iris)
 str(iris)
-
-# 2. Base R Box Plots
-# Custom Color Palette
-species_colors <- c(
-  "setosa" = "red",
-  "versicolor" = "steelblue",
-  "virginica" = "green"
+View(iris)
+# Basic Scatter Plot: Sepal Length vs Sepal Width
+plot(iris$Sepal.Length, iris$Sepal.Width)
+# Labeled Scatter Plot
+plot(
+  iris$Sepal.Length,
+  iris$Sepal.Width,
+  main = "Sepal Length vs Sepal Width",
+  xlab = "Sepal Length (cm)",
+  ylab = "Sepal Width (cm)",
+  col = "blue",
+  pch = 16
 )
-
-# Grouped Box Plot
-boxplot(Sepal.Length ~ Species,
-        data = iris,
-        col = species_colors,
-        main = "Sepal Length by Species (Base R)",
-        xlab = "Species",
-        ylab = "Sepal Length")
-
-# 3. GGplot2 Box Plots
+# Colored Scatter Plot by Species
+plot(
+  iris$Sepal.Length,
+  iris$Sepal.Width,
+  col = as.numeric(iris$Species),
+  pch = 16,
+  main = "Sepal Dimensions by Species"
+)
+legend(
+  "topright",
+  legend = levels(iris$Species),
+  col = 1:3,
+  pch = 16
+)
+# Multivariate Scatter
+# Add size as a third variable
+plot(
+  iris$Sepal.Length,
+  iris$Sepal.Width,
+  col = as.numeric(iris$Species),
+  pch = 16,
+  cex = iris$Petal.Length / max(iris$Petal.Length),
+  main = "Multivariate Scatter Plot (Color + Size)"
+)
+# Scatter Plot Matrix
+# All numeric variables against each other
+pairs(
+  iris[, 1:4],
+  col = as.numeric(iris$Species),
+  pch = 16,
+  main = "Scatter Plot Matrix of Iris Dataset"
+)
+# Using GGPLOT2
+# Load ggplot2
 library(ggplot2)
-
-ggplot(iris, aes(x = Species, y = Sepal.Length, fill = Species)) +
-  geom_boxplot() + 
-  scale_fill_manual(values = species_colors) +
-  theme_minimal() +
-  labs(title = "Sepal Length by Species (ggplot2)",
-       x = "Flower Species",
-       y = "Sepal Length (cm)")
-
-# ==========================================
-# PART 2: Diamonds Dataset (Density Plots)
-# ==========================================
-
-# 1. Load and Understand
-data(diamonds)
-str(diamonds)
-dim(diamonds)
-
-# 2. Base R Scatter Plot
-# Using transparency (rgb) because there are >50,000 points
-plot(diamonds$carat, diamonds$price, 
-     col = rgb(0, 0, 1, 0.1), 
-     pch = 16,
-     main = "Scatter Plot: Carat vs Price",
-     xlab = "Carat",
-     ylab = "Price")
-
-# 3. Hexbin using Base R
-# Check if package exists, then load
-if(!require(hexbin)) install.packages('hexbin')
-library(hexbin)
-
-hb <- hexbin(diamonds$carat, diamonds$price, xbins = 40)
-plot(hb, main = "Hexbin Plot: Carat vs Price (Base R)")
-
-# 4. GGplot2 Hexbin Plots (Fixed Typos)
-# Basic Hexbin
-ggplot(diamonds, aes(x = carat, y = price)) +
-  geom_hex() +
-  theme_minimal() +
-  labs(title = "Basic Hexbin Plot")
-
-# Labeled and Styled Hexbin
-ggplot(diamonds, aes(x = carat, y = price)) +
-  geom_hex() +
-  scale_fill_gradient(low = "lightblue", high = "red") +
-  theme_minimal() +
-  labs(title = "Hexagon Binning: Carat vs Price",
-       subtitle = "Density visualization of 53,940 diamonds",
-       x = "Carat (Weight)",
-       y = "Price (USD)",
-       fill = "Count")
-
-# ==========================================
-# PART 3: Global Package Check (Optional)
-# ==========================================
-# View all available datasets in your installed packages
-# data(package = .packages(all.available = TRUE))
+# Basic Scatter Plot
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point()
+# Colored Scatter by Species
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width, color =
+                   Species)) +
+  geom_point(size = 2) +
+  theme_minimal()
+# Multivariate Scatter Plot
+# Color + Size encoding
+ggplot(
+  iris,
+  aes(
+    x = Sepal.Length,
+    y = Sepal.Width,
+    color = Species,
+    size = Petal.Length
+  )
+) +
+  geom_point(alpha = 0.7) +
+  theme_minimal()
+# Faceted Scatter Plot
+# One scatter plot per species
+ggplot(iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point(color = "steelblue") +
+  facet_wrap(~Species) +
+  theme_minimal()
+# Scatter Plot Matrix
+# Using GGally (extension of ggplot2)
+library(GGally)
+ggpairs(
+  iris,
+  columns = 1:4,
+  aes(color = Species, alpha = 0.6)
+)
